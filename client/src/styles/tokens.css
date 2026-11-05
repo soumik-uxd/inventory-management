@@ -1,0 +1,78 @@
+/*
+ * Starter design tokens for a SaaS-style Vue app.
+ * Copy to the app (e.g. src/styles/tokens.css) and import it once from main.js,
+ * before any component styles load. If the project already defines a palette
+ * (CLAUDE.md, theme file, Tailwind config), map these names onto those values
+ * instead of introducing new colors.
+ */
+:root {
+  /* Spacing: 4px base. Use only these steps for padding, margin and gap. */
+  --space-1: 0.25rem;  /* 4px */
+  --space-2: 0.5rem;   /* 8px */
+  --space-3: 0.75rem;  /* 12px */
+  --space-4: 1rem;     /* 16px */
+  --space-5: 1.25rem;  /* 20px */
+  --space-6: 1.5rem;   /* 24px */
+  --space-7: 2rem;     /* 32px */
+  --space-8: 3rem;     /* 48px */
+
+  /* Radius: three steps only. Controls/badges sm, inputs/buttons md, cards/modals lg. */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* Neutrals (slate). */
+  --color-bg: #f8fafc;          /* page background */
+  --color-surface: #ffffff;     /* cards, topbar, sidebar */
+  --color-surface-muted: #f1f5f9; /* table headers, hover rows */
+  --color-border: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+  --color-text: #0f172a;        /* headings, primary text */
+  --color-text-secondary: #475569;
+  --color-text-muted: #64748b;  /* labels, captions */
+  --color-text-subtle: #94a3b8; /* placeholders, disabled */
+
+  /* Primary: exactly one brand blue. */
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-soft: #eff6ff; /* active nav item, selected rows */
+
+  /* Status: foreground / soft background pairs. */
+  --color-success: #059669;
+  --color-success-soft: #d1fae5;
+  --color-info: #2563eb;
+  --color-info-soft: #dbeafe;
+  --color-warning: #d97706;
+  --color-warning-soft: #fef3c7;
+  --color-danger: #dc2626;
+  --color-danger-soft: #fee2e2;
+
+  /* Elevation. */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.16);
+
+  /* Typography. Load the face in index.html or fall back to the system stack. */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 0.9375rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+
+  /* Layout. Sticky elements below the topbar must offset by --topbar-height. */
+  --sidebar-width: 248px;
+  --sidebar-collapsed-width: 72px; /* icons-only rail */
+  --topbar-height: 64px;
+  --content-max-width: 1440px;
+
+  /* Layers, lowest to highest. Keep every z-index in the app on this list. */
+  --z-sticky: 90;     /* sticky sub-bars (filters, toolbars) */
+  --z-topbar: 100;
+  --z-sidebar: 110;   /* above topbar so the mobile drawer covers it */
+  --z-dropdown: 1000;
+  --z-modal: 2000;
+
+  --transition-fast: 150ms ease;
+}

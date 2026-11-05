@@ -1,7 +1,6 @@
 <template>
   <div class="spending">
     <div class="page-header">
-      <h2>{{ t('finance.title') }}</h2>
       <p>{{ t('finance.description') }}</p>
     </div>
 
@@ -9,7 +8,7 @@
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else>
       <!-- Revenue & Financial KPIs -->
-      <div class="stats-grid-finance">
+      <div class="stats-grid">
         <div class="stat-card revenue-card">
           <div class="stat-label">{{ t('finance.totalRevenue') }}</div>
           <div class="stat-value">{{ formatCurrency(revenueMetrics.totalRevenue) }}</div>
@@ -493,41 +492,59 @@ export default {
 
 <style scoped>
 .stat-change {
-  margin-top: 0.75rem;
-  font-size: 0.875rem;
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-1);
 }
 
 .stat-change.positive {
-  color: #059669;
+  color: var(--color-success);
 }
 
 .stat-change.negative {
-  color: #dc2626;
+  color: var(--color-danger);
 }
 
 .change-icon {
   font-weight: 700;
-  font-size: 1rem;
+  font-size: var(--text-base);
 }
 
-.chart-card {
-  margin-bottom: 1.75rem;
+/* Finance stat cards only recolor the canonical .stat-card left accent, using
+   tokens. The cost card's --color-danger is a deeper red than the chart's
+   literal cost series color, so the two are related but don't match exactly. */
+.revenue-card {
+  border-left-color: var(--color-text);
+}
+
+.cost-card {
+  border-left-color: var(--color-danger);
+}
+
+.profit-card {
+  border-left-color: var(--color-primary);
+}
+
+.stat-meta {
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
 }
 
 .chart-legend {
   display: flex;
-  gap: 1.5rem;
-  font-size: 0.875rem;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+  font-size: var(--text-sm);
 }
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  color: #64748b;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
 }
 
 .legend-dot {
@@ -536,6 +553,8 @@ export default {
   border-radius: 3px;
 }
 
+/* Series colors stay literal on purpose: they encode data (cost type, revenue
+   vs cost) and must match the bar segments below. Purple has no status token. */
 .legend-dot.procurement { background: #3b82f6; }
 .legend-dot.operational { background: #8b5cf6; }
 .legend-dot.labor { background: #10b981; }
@@ -543,31 +562,7 @@ export default {
 .legend-dot.revenue-color { background: #0f172a; }
 .legend-dot.cost-color { background: #ef4444; }
 
-.stats-grid-finance {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.revenue-card {
-  border-left: 4px solid #0f172a;
-}
-
-.cost-card {
-  border-left: 4px solid #ef4444;
-}
-
-.profit-card {
-  border-left: 4px solid #3b82f6;
-}
-
-.stat-meta {
-  margin-top: 0.5rem;
-  font-size: 0.813rem;
-  color: #64748b;
-}
-
+/* Bar sizes and gaps below are chart geometry and stay as-is */
 .bar-group-revenue {
   display: flex;
   flex-direction: column;
@@ -590,12 +585,13 @@ export default {
 .revenue-bar, .cost-bar {
   width: 50%;
   max-width: 30px;
-  border-radius: 6px 6px 0 0;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
   transition: all 0.3s ease;
   cursor: pointer;
   min-height: 4px;
 }
 
+/* Literal series colors, matching .legend-dot.revenue-color / .cost-color */
 .revenue-bar {
   background: #0f172a;
 }
@@ -610,12 +606,12 @@ export default {
 }
 
 .chart-container {
-  padding: 1.5rem 0;
+  padding: var(--space-6) 0;
 }
 
 .bar-chart {
   display: flex;
-  gap: 1.5rem;
+  gap: var(--space-6);
   height: 350px;
 }
 
@@ -623,18 +619,19 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding-right: 1rem;
-  font-size: 0.75rem;
-  color: #94a3b8;
-  border-right: 1px solid #e2e8f0;
+  padding-right: var(--space-4);
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
+  border-right: 1px solid var(--color-border);
 }
 
 .chart-area {
   flex: 1;
+  min-width: 0;
   display: flex;
   align-items: flex-end;
   justify-content: space-around;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .bar-group {
@@ -669,13 +666,14 @@ export default {
 }
 
 .bar-segment:first-child {
-  border-radius: 0 0 6px 6px;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
 }
 
 .bar-segment:last-child {
-  border-radius: 6px 6px 0 0;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
 }
 
+/* Literal series colors, matching the .legend-dot cost types above */
 .bar-segment.procurement { background: #3b82f6; }
 .bar-segment.operational { background: #8b5cf6; }
 .bar-segment.labor { background: #10b981; }
@@ -686,28 +684,35 @@ export default {
 }
 
 .bar-label {
-  margin-top: 0.5rem;
-  font-size: 0.75rem;
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
   font-weight: 600;
-  color: #64748b;
+  color: var(--color-text-muted);
 }
 
+/* min(450px, 100%) lets each card take the full width on phones instead of overflowing */
 .two-column-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-  gap: 1.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(450px, 100%), 1fr));
+  gap: var(--space-6);
+}
+
+/* Cards in the grid are spaced by the grid gap */
+.two-column-grid > .card {
+  min-width: 0;
+  margin-bottom: 0;
 }
 
 .category-list {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--space-6);
 }
 
 .category-item {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .category-info {
@@ -718,38 +723,38 @@ export default {
 
 .category-name {
   font-weight: 600;
-  color: #0f172a;
+  color: var(--color-text);
 }
 
 .category-amount {
   font-weight: 700;
-  color: #2563eb;
-  font-size: 1.125rem;
+  color: var(--color-primary);
+  font-size: var(--text-lg);
 }
 
 .category-bar-container {
   width: 100%;
   height: 8px;
-  background: #f1f5f9;
-  border-radius: 4px;
+  background: var(--color-surface-muted);
+  border-radius: var(--radius-full);
   overflow: hidden;
 }
 
 .category-bar {
   height: 100%;
-  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
-  border-radius: 4px;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
   transition: width 0.6s ease;
 }
 
 .category-meta {
   display: flex;
   justify-content: space-between;
-  font-size: 0.813rem;
+  font-size: var(--text-xs);
 }
 
 .percentage {
-  color: #64748b;
+  color: var(--color-text-muted);
 }
 
 .change {
@@ -757,11 +762,11 @@ export default {
 }
 
 .change.positive {
-  color: #059669;
+  color: var(--color-success);
 }
 
 .change.negative {
-  color: #dc2626;
+  color: var(--color-danger);
 }
 
 .transactions-card {
@@ -769,81 +774,62 @@ export default {
   flex-direction: column;
 }
 
+/* Scrolls both ways: vertical for the 400px cap, horizontal at phone width.
+   isolation keeps the sticky header's z-index local to this box so it can't
+   paint over the app's sticky filter bar or topbar. */
 .transactions-table-container {
-  overflow-y: auto;
+  overflow: auto;
   max-height: 400px;
+  isolation: isolate;
 }
 
-.transactions-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
+/* Sticky header inside the scroll box. z-index 1 is a local layer (see isolation
+   above), not an app layer, so it stays literal. */
 .transactions-table thead {
   position: sticky;
   top: 0;
-  background: #f8fafc;
   z-index: 1;
-}
-
-.transactions-table th {
-  text-align: left;
-  padding: 0.625rem 0.75rem;
-  font-weight: 600;
-  color: #475569;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-bottom: 1px solid #e2e8f0;
 }
 
 .transactions-table th.text-right {
   text-align: right;
 }
 
-.transactions-table td {
-  padding: 0.75rem 0.75rem;
-  border-bottom: 1px solid #f1f5f9;
-  font-size: 0.875rem;
-}
-
 .transactions-table tbody tr {
   cursor: pointer;
-  transition: background-color 0.15s ease;
 }
 
-.transactions-table tbody tr:hover {
-  background: #f8fafc;
-}
-
+/* Clickable rows hover in primary-soft rather than the neutral table hover */
 .transactions-table tbody tr.clickable-row:hover {
-  background: #eff6ff;
+  background: var(--color-primary-soft);
 }
 
 .transaction-id {
-  color: #64748b;
+  color: var(--color-text-muted);
   font-weight: 500;
   font-family: 'Monaco', 'Courier New', monospace;
-  font-size: 0.813rem;
+  font-size: var(--text-xs);
 }
 
 .transaction-description {
-  color: #0f172a;
+  color: var(--color-text);
   font-weight: 500;
 }
 
 .transaction-vendor {
-  color: #64748b;
+  color: var(--color-text-muted);
 }
 
 .transaction-date {
-  color: #64748b;
-  font-size: 0.813rem;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  white-space: nowrap;
 }
 
 .transaction-amount {
   font-weight: 700;
-  color: #0f172a;
+  color: var(--color-text);
+  white-space: nowrap;
 }
 
 .text-right {
