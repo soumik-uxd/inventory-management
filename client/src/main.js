@@ -1,5 +1,7 @@
 import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
+// Design tokens must load before any component styles so var() references resolve everywhere
+import './styles/tokens.css'
 import App from './App.vue'
 import Dashboard from './views/Dashboard.vue'
 import Inventory from './views/Inventory.vue'
