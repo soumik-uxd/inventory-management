@@ -9,7 +9,16 @@
         aria-controls="app-sidebar"
         @click="$emit('toggle-sidebar')"
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
           <path d="M4 6h16" />
           <path d="M4 12h16" />
           <path d="M4 18h16" />
@@ -29,42 +38,42 @@
 </template>
 
 <script>
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
-import { useI18n } from '../composables/useI18n'
-import { findNavItem } from '../navigation'
-import LanguageSwitcher from './LanguageSwitcher.vue'
-import ProfileMenu from './ProfileMenu.vue'
+import { computed } from "vue";
+import { useRoute } from "vue-router";
+import { useI18n } from "../composables/useI18n";
+import { findNavItem } from "../navigation";
+import LanguageSwitcher from "./LanguageSwitcher.vue";
+import ProfileMenu from "./ProfileMenu.vue";
 
 export default {
-  name: 'AppTopbar',
+  name: "AppTopbar",
   components: {
     LanguageSwitcher,
-    ProfileMenu
+    ProfileMenu,
   },
   props: {
     sidebarOpen: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
-  emits: ['toggle-sidebar', 'show-profile-details', 'show-tasks'],
+  emits: ["toggle-sidebar", "show-profile-details", "show-tasks"],
   setup() {
-    const route = useRoute()
-    const { t } = useI18n()
+    const route = useRoute();
+    const { t } = useI18n();
 
     // Title comes from the same nav config as the sidebar, so labels never drift
     const pageTitle = computed(() => {
-      const item = findNavItem(route.path)
-      return item ? t(item.labelKey) : t('nav.companyName')
-    })
+      const item = findNavItem(route.path);
+      return item ? t(item.labelKey) : t("nav.companyName");
+    });
 
     return {
       t,
-      pageTitle
-    }
-  }
-}
+      pageTitle,
+    };
+  },
+};
 </script>
 
 <style scoped>
@@ -103,7 +112,9 @@ export default {
   border-radius: var(--radius-md);
   color: var(--color-text-secondary);
   cursor: pointer;
-  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast);
 }
 
 .menu-toggle:hover {

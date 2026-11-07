@@ -7,15 +7,24 @@
   >
     <div class="sidebar-brand">
       <div class="brand-mark" aria-hidden="true">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
           <path d="M21 8 12 3 3 8v8l9 5 9-5V8Z" />
           <path d="M3 8l9 5 9-5" />
           <path d="M12 13v8" />
         </svg>
       </div>
       <div class="brand-text">
-        <span class="brand-name">{{ t('nav.companyName') }}</span>
-        <span class="brand-subtitle">{{ t('nav.subtitle') }}</span>
+        <span class="brand-name">{{ t("nav.companyName") }}</span>
+        <span class="brand-subtitle">{{ t("nav.subtitle") }}</span>
       </div>
     </div>
 
@@ -108,58 +117,58 @@
 </template>
 
 <script>
-import { ref, computed, watch } from 'vue'
-import { useI18n } from '../composables/useI18n'
-import { navItems } from '../navigation'
+import { ref, computed, watch } from "vue";
+import { useI18n } from "../composables/useI18n";
+import { navItems } from "../navigation";
 
 // Must match the rail media queries below and the drawer breakpoint in App.vue
-const RAIL_QUERY = '(min-width: 768px)'
+const RAIL_QUERY = "(min-width: 768px)";
 
 export default {
-  name: 'AppSidebar',
+  name: "AppSidebar",
   props: {
     open: {
       type: Boolean,
-      default: false
+      default: false,
     },
     // Icons-only rail. Only takes effect at >=768px; the drawer ignores it.
     collapsed: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
-  emits: ['close', 'toggle-collapse'],
+  emits: ["close", "toggle-collapse"],
   setup(props) {
-    const { t } = useI18n()
+    const { t } = useI18n();
 
     const toggleLabel = computed(() =>
-      props.collapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')
-    )
+      props.collapsed ? t("nav.expandSidebar") : t("nav.collapseSidebar"),
+    );
 
-    const tooltip = ref(null)
+    const tooltip = ref(null);
 
     // Positions the fixed tooltip just right of the hovered/focused control,
     // vertically centered on it. Only shown in rail mode, where labels are hidden.
     const showTooltip = (event, label, fromFocus = false) => {
-      if (!props.collapsed || !window.matchMedia(RAIL_QUERY).matches) return
-      const el = event.currentTarget
+      if (!props.collapsed || !window.matchMedia(RAIL_QUERY).matches) return;
+      const el = event.currentTarget;
       // Mouse clicks also focus the link; only show on keyboard focus so the
       // tooltip doesn't linger after the pointer leaves
-      if (fromFocus && !el.matches(':focus-visible')) return
-      const rect = el.getBoundingClientRect()
+      if (fromFocus && !el.matches(":focus-visible")) return;
+      const rect = el.getBoundingClientRect();
       tooltip.value = {
         label,
         top: rect.top + rect.height / 2,
-        left: rect.right + 12
-      }
-    }
+        left: rect.right + 12,
+      };
+    };
 
     const hideTooltip = () => {
-      tooltip.value = null
-    }
+      tooltip.value = null;
+    };
 
     // Expanding shows the real labels, so drop any tooltip left from the rail
-    watch(() => props.collapsed, hideTooltip)
+    watch(() => props.collapsed, hideTooltip);
 
     return {
       t,
@@ -167,10 +176,10 @@ export default {
       toggleLabel,
       tooltip,
       showTooltip,
-      hideTooltip
-    }
-  }
-}
+      hideTooltip,
+    };
+  },
+};
 </script>
 
 <style scoped>
@@ -254,7 +263,9 @@ export default {
   font-size: var(--text-sm);
   font-weight: 500;
   text-decoration: none;
-  transition: background-color var(--transition-fast), color var(--transition-fast);
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
 }
 
 .nav-item:hover {
@@ -314,7 +325,9 @@ export default {
   border-radius: var(--radius-md);
   color: var(--color-text-muted);
   cursor: pointer;
-  transition: background-color var(--transition-fast), color var(--transition-fast);
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
 }
 
 .collapse-toggle:hover {
@@ -366,7 +379,7 @@ export default {
 
 /* Small arrow pointing back at the control */
 .nav-tooltip::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   right: 100%;

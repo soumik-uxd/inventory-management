@@ -45,139 +45,142 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue'
-import { useRoute } from 'vue-router'
-import { api } from './api'
-import { useAuth } from './composables/useAuth'
-import { useI18n } from './composables/useI18n'
-import AppSidebar from './components/AppSidebar.vue'
-import AppTopbar from './components/AppTopbar.vue'
-import FilterBar from './components/FilterBar.vue'
-import ProfileDetailsModal from './components/ProfileDetailsModal.vue'
-import TasksModal from './components/TasksModal.vue'
+import { ref, onMounted, onUnmounted, computed, watch, nextTick } from "vue";
+import { useRoute } from "vue-router";
+import { api } from "./api";
+import { useAuth } from "./composables/useAuth";
+import { useI18n } from "./composables/useI18n";
+import AppSidebar from "./components/AppSidebar.vue";
+import AppTopbar from "./components/AppTopbar.vue";
+import FilterBar from "./components/FilterBar.vue";
+import ProfileDetailsModal from "./components/ProfileDetailsModal.vue";
+import TasksModal from "./components/TasksModal.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
     AppSidebar,
     AppTopbar,
     FilterBar,
     ProfileDetailsModal,
-    TasksModal
+    TasksModal,
   },
   setup() {
-    const { currentUser } = useAuth()
-    const { t } = useI18n()
-    const showProfileDetails = ref(false)
-    const showTasks = ref(false)
-    const apiTasks = ref([])
+    const { currentUser } = useAuth();
+    const { t } = useI18n();
+    const showProfileDetails = ref(false);
+    const showTasks = ref(false);
+    const apiTasks = ref([]);
 
     // Merge mock tasks from currentUser with API tasks
     const tasks = computed(() => {
-      return [...currentUser.value.tasks, ...apiTasks.value]
-    })
+      return [...currentUser.value.tasks, ...apiTasks.value];
+    });
 
     const loadTasks = async () => {
       try {
-        apiTasks.value = await api.getTasks()
+        apiTasks.value = await api.getTasks();
       } catch (err) {
-        console.error('Failed to load tasks:', err)
+        console.error("Failed to load tasks:", err);
       }
-    }
+    };
 
     const addTask = async (taskData) => {
       try {
-        const newTask = await api.createTask(taskData)
+        const newTask = await api.createTask(taskData);
         // Add new task to the beginning of the array
-        apiTasks.value.unshift(newTask)
+        apiTasks.value.unshift(newTask);
       } catch (err) {
-        console.error('Failed to add task:', err)
+        console.error("Failed to add task:", err);
       }
-    }
+    };
 
     const deleteTask = async (taskId) => {
       try {
         // Check if it's a mock task (from currentUser)
-        const isMockTask = currentUser.value.tasks.some(t => t.id === taskId)
+        const isMockTask = currentUser.value.tasks.some((t) => t.id === taskId);
 
         if (isMockTask) {
           // Remove from mock tasks
-          const index = currentUser.value.tasks.findIndex(t => t.id === taskId)
+          const index = currentUser.value.tasks.findIndex(
+            (t) => t.id === taskId,
+          );
           if (index !== -1) {
-            currentUser.value.tasks.splice(index, 1)
+            currentUser.value.tasks.splice(index, 1);
           }
         } else {
           // Remove from API tasks
-          await api.deleteTask(taskId)
-          apiTasks.value = apiTasks.value.filter(t => t.id !== taskId)
+          await api.deleteTask(taskId);
+          apiTasks.value = apiTasks.value.filter((t) => t.id !== taskId);
         }
       } catch (err) {
-        console.error('Failed to delete task:', err)
+        console.error("Failed to delete task:", err);
       }
-    }
+    };
 
     const toggleTask = async (taskId) => {
       try {
         // Check if it's a mock task (from currentUser)
-        const mockTask = currentUser.value.tasks.find(t => t.id === taskId)
+        const mockTask = currentUser.value.tasks.find((t) => t.id === taskId);
 
         if (mockTask) {
           // Toggle mock task status
-          mockTask.status = mockTask.status === 'pending' ? 'completed' : 'pending'
+          mockTask.status =
+            mockTask.status === "pending" ? "completed" : "pending";
         } else {
           // Toggle API task
-          const updatedTask = await api.toggleTask(taskId)
-          const index = apiTasks.value.findIndex(t => t.id === taskId)
+          const updatedTask = await api.toggleTask(taskId);
+          const index = apiTasks.value.findIndex((t) => t.id === taskId);
           if (index !== -1) {
-            apiTasks.value[index] = updatedTask
+            apiTasks.value[index] = updatedTask;
           }
         }
       } catch (err) {
-        console.error('Failed to toggle task:', err)
+        console.error("Failed to toggle task:", err);
       }
-    }
+    };
 
-    onMounted(loadTasks)
+    onMounted(loadTasks);
 
     // Mobile drawer state. Only has a visible effect below 768px; at wider
     // widths the sidebar is always shown and the hamburger is hidden.
-    const route = useRoute()
-    const sidebarOpen = ref(false)
+    const route = useRoute();
+    const sidebarOpen = ref(false);
 
     const toggleSidebar = () => {
-      sidebarOpen.value = !sidebarOpen.value
-    }
+      sidebarOpen.value = !sidebarOpen.value;
+    };
 
     const closeSidebar = () => {
-      sidebarOpen.value = false
-    }
+      sidebarOpen.value = false;
+    };
 
     // Close after navigation so the drawer doesn't cover the page just opened
-    watch(() => route.fullPath, closeSidebar)
+    watch(() => route.fullPath, closeSidebar);
 
     // On open, move focus into the drawer so keyboard users land on the nav.
     // nextTick waits for .is-open to apply; the open rule drops the visibility
     // delay, so the link is focusable right away. Queried by id because the
     // links live inside AppSidebar and there is no ref across the component.
     watch(sidebarOpen, async (open) => {
-      if (!open) return
-      await nextTick()
-      const firstLink = document.querySelector('#app-sidebar .nav-item')
-      if (firstLink) firstLink.focus()
-    })
+      if (!open) return;
+      await nextTick();
+      const firstLink = document.querySelector("#app-sidebar .nav-item");
+      if (firstLink) firstLink.focus();
+    });
 
     const handleKeydown = (event) => {
-      if (event.key === 'Escape' && sidebarOpen.value) {
-        closeSidebar()
+      if (event.key === "Escape" && sidebarOpen.value) {
+        closeSidebar();
         // Escape dismisses without navigating, so return focus to the control
         // that opened the drawer instead of leaving it on a now-hidden link
-        const toggle = document.querySelector('.menu-toggle')
-        if (toggle) toggle.focus()
+        const toggle = document.querySelector(".menu-toggle");
+        if (toggle) toggle.focus();
       }
-    }
+    };
 
-    onMounted(() => window.addEventListener('keydown', handleKeydown))
-    onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
+    onMounted(() => window.addEventListener("keydown", handleKeydown));
+    onUnmounted(() => window.removeEventListener("keydown", handleKeydown));
 
     // Rail (icons-only) vs expanded sidebar, for >=768px. Below 768px the drawer
     // always shows full labels and this value is ignored by the CSS.
@@ -185,52 +188,54 @@ export default {
     // made at >=1280px is persisted; at narrower widths the rail is the
     // default every time, so a toggle there lasts until the next reload or
     // until the 1280px boundary is crossed.
-    const WIDE_QUERY = '(min-width: 1280px)'
-    const COLLAPSED_STORAGE_KEY = 'sidebarCollapsed'
+    const WIDE_QUERY = "(min-width: 1280px)";
+    const COLLAPSED_STORAGE_KEY = "sidebarCollapsed";
 
     // localStorage can throw (privacy mode, disabled storage, quota), so every
     // access is guarded and failures fall back to the width-based default
     const readStoredCollapsed = () => {
       try {
-        const value = window.localStorage.getItem(COLLAPSED_STORAGE_KEY)
-        return value === null ? null : value === 'true'
+        const value = window.localStorage.getItem(COLLAPSED_STORAGE_KEY);
+        return value === null ? null : value === "true";
       } catch {
-        return null
+        return null;
       }
-    }
+    };
 
     const writeStoredCollapsed = (value) => {
       try {
-        window.localStorage.setItem(COLLAPSED_STORAGE_KEY, String(value))
+        window.localStorage.setItem(COLLAPSED_STORAGE_KEY, String(value));
       } catch {
         // Persistence is optional; the in-memory state still works
       }
-    }
+    };
 
     // matchMedia is evaluated synchronously in setup (not onMounted) so the
     // first render already has the right width and the rail doesn't animate in
-    const wideMedia = window.matchMedia(WIDE_QUERY)
+    const wideMedia = window.matchMedia(WIDE_QUERY);
     const defaultCollapsed = (isWide) => {
-      if (!isWide) return true
-      const stored = readStoredCollapsed()
-      return stored === null ? false : stored
-    }
+      if (!isWide) return true;
+      const stored = readStoredCollapsed();
+      return stored === null ? false : stored;
+    };
 
-    const sidebarCollapsed = ref(defaultCollapsed(wideMedia.matches))
+    const sidebarCollapsed = ref(defaultCollapsed(wideMedia.matches));
 
     const toggleSidebarCollapsed = () => {
-      sidebarCollapsed.value = !sidebarCollapsed.value
-      if (wideMedia.matches) writeStoredCollapsed(sidebarCollapsed.value)
-    }
+      sidebarCollapsed.value = !sidebarCollapsed.value;
+      if (wideMedia.matches) writeStoredCollapsed(sidebarCollapsed.value);
+    };
 
     // Crossing 1280px in either direction resets to that side's default
     // (the stored choice when going wide, the rail when going narrow)
     const handleWideChange = (event) => {
-      sidebarCollapsed.value = defaultCollapsed(event.matches)
-    }
+      sidebarCollapsed.value = defaultCollapsed(event.matches);
+    };
 
-    onMounted(() => wideMedia.addEventListener('change', handleWideChange))
-    onUnmounted(() => wideMedia.removeEventListener('change', handleWideChange))
+    onMounted(() => wideMedia.addEventListener("change", handleWideChange));
+    onUnmounted(() =>
+      wideMedia.removeEventListener("change", handleWideChange),
+    );
 
     return {
       showProfileDetails,
@@ -243,10 +248,10 @@ export default {
       toggleSidebar,
       closeSidebar,
       sidebarCollapsed,
-      toggleSidebarCollapsed
-    }
-  }
-}
+      toggleSidebarCollapsed,
+    };
+  },
+};
 </script>
 
 <style>
@@ -329,7 +334,9 @@ body {
     width: var(--sidebar-width);
     transform: translateX(-100%);
     visibility: hidden;
-    transition: transform var(--transition-fast), visibility 0s linear 150ms;
+    transition:
+      transform var(--transition-fast),
+      visibility 0s linear 150ms;
   }
 
   /* No delay on open so the drawer is focusable as soon as it starts sliding in */
@@ -404,7 +411,9 @@ body {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   padding: var(--space-6);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .stat-card:hover {
@@ -427,17 +436,33 @@ body {
   letter-spacing: -0.025em;
 }
 
-.stat-card.success { border-left-color: var(--color-success); }
-.stat-card.success .stat-value { color: var(--color-success); }
+.stat-card.success {
+  border-left-color: var(--color-success);
+}
+.stat-card.success .stat-value {
+  color: var(--color-success);
+}
 
-.stat-card.info { border-left-color: var(--color-info); }
-.stat-card.info .stat-value { color: var(--color-info); }
+.stat-card.info {
+  border-left-color: var(--color-info);
+}
+.stat-card.info .stat-value {
+  color: var(--color-info);
+}
 
-.stat-card.warning { border-left-color: var(--color-warning); }
-.stat-card.warning .stat-value { color: var(--color-warning); }
+.stat-card.warning {
+  border-left-color: var(--color-warning);
+}
+.stat-card.warning .stat-value {
+  color: var(--color-warning);
+}
 
-.stat-card.danger { border-left-color: var(--color-danger); }
-.stat-card.danger .stat-value { color: var(--color-danger); }
+.stat-card.danger {
+  border-left-color: var(--color-danger);
+}
+.stat-card.danger .stat-value {
+  color: var(--color-danger);
+}
 
 /* ---------- Cards ---------- */
 
@@ -566,7 +591,9 @@ tbody tr:hover {
   font-size: var(--text-sm);
   font-weight: 600;
   cursor: pointer;
-  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast);
 }
 
 .btn-primary {
@@ -575,7 +602,7 @@ tbody tr:hover {
   color: var(--color-surface);
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   background: var(--color-primary-hover);
   border-color: var(--color-primary-hover);
 }
@@ -586,8 +613,14 @@ tbody tr:hover {
   color: var(--color-text-secondary);
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover:not(:disabled) {
   background: var(--color-surface-muted);
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .btn-primary:focus-visible,
@@ -650,7 +683,9 @@ tbody tr:hover {
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-sm);
-  transition: background-color var(--transition-fast), color var(--transition-fast);
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
 }
 
 .close-button:hover {
